@@ -1,0 +1,232 @@
+# WeWeb Component Development Guidelines
+
+## Overview
+
+This document provides comprehensive guidelines for developing custom coded components for WeWeb using Vue.js. WeWeb components are Vue.js components that integrate with the WeWeb visual editor.
+
+## Project Structure
+
+### Core Files
+
+- **`ww-config.js`**: Configuration file that defines component properties, editor labels, and metadata
+- **`src/wwElement.vue`**: Main Vue component file (for elements) or `wwSection.vue` (for sections)
+- **`package.json`**: Project dependencies and build scripts
+
+### Build Commands
+
+- `npm run serve`: Start local development server (default port: 8080, can specify with `--port=PORT`)
+- `npm run build --name=component-name`: Build component for production
+
+## Component Architecture
+
+### Vue Component Structure
+
+WeWeb components are standard Vue.js components with specific requirements:
+
+#### Required Props
+
+Every WeWeb component must include these props:
+
+```javascript
+props: {
+  uid: { type: String, required: true },        // Unique identifier for the component instance
+  content: { type: Object, required: true },    // Contains all property values from ww-config.js
+  /* wwEditor:start */
+  wwEditorState: { type: Object, required: true }, // Editor state (only available in editor)
+  /* wwEditor:end */
+}
+```
+
+#### Editor State Detection
+
+Use computed properties to detect if component is being edited:
+
+```javascript
+/* wwEditor:start */
+const isEditing = computed(() => {
+  return props.wwEditorState?.isEditing || false;
+});
+/* wwEditor:end */
+```
+
+The `/* wwEditor:start */` and `/* wwEditor:end */` comments are important - code between them is only included in the editor build, not in the production build.
+
+### Configuration File (ww-config.js)
+
+The `ww-config.js` file defines:
+
+1. **Editor Labels**: Display names in the WeWeb editor
+2. **Properties**: Configurable properties that appear in the editor panel
+3. **Property Types**: Supported types include Color, Text, Number, Boolean, Select, etc.
+
+#### Example Configuration
+
+```javascript
+export default {
+  editor: {
+    label: {
+      en: "My Element",  // Display name in editor
+    },
+  },
+  properties: {
+    textColor: {
+      label: {
+        en: "Text color",
+      },
+      type: "Color",
+      defaultValue: "#F23636",
+    },
+    title: {
+      label: {
+        en: "Title",
+      },
+      type: "Text",
+      defaultValue: "Default Title",
+    },
+  },
+};
+```
+
+#### Accessing Properties in Component
+
+Properties defined in `ww-config.js` are accessible via `props.content`:
+
+```javascript
+// In ww-config.js: textColor property
+// In component:
+computed: {
+  textStyle() {
+    return {
+      color: this.content.textColor,  // Access property value
+    };
+  },
+}
+```
+
+## Development Best Practices
+
+### 1. Component Naming
+
+- Use descriptive, kebab-case names for component classes
+- Prefix with meaningful identifiers (e.g., `flippable-card`, `interactive-map`)
+
+### 2. Styling
+
+- Use scoped styles to prevent CSS conflicts
+- Support SCSS/SASS if needed
+- Ensure responsive design considerations
+
+### 3. Property Definitions
+
+- Always provide `defaultValue` for properties
+- Use appropriate property types:
+  - `Color`: For color pickers
+  - `Text`: For text inputs
+  - `Number`: For numeric inputs
+  - `Boolean`: For checkboxes/toggles
+  - `Select`: For dropdowns (requires `options` array)
+  - `Textarea`: For multi-line text
+  - `Image`: For image uploads
+
+### 4. Editor vs Production Code
+
+- Wrap editor-specific code with `/* wwEditor:start */` and `/* wwEditor:end */` comments
+- This ensures editor-only features don't bloat production builds
+
+### 5. Reactive Data
+
+- Use Vue 3 Composition API (`setup()`) or Options API consistently
+- Ensure all reactive properties are properly defined
+- Use `computed` for derived values
+
+### 6. Component Props Pattern
+
+Always follow this pattern for props:
+
+```javascript
+export default {
+  props: {
+    uid: { type: String, required: true },
+    content: { type: Object, required: true },
+    /* wwEditor:start */
+    wwEditorState: { type: Object, required: true },
+    /* wwEditor:end */
+  },
+  // ... rest of component
+}
+```
+
+## Local Development Workflow
+
+1. **Start Dev Server**: `npm run serve` (or `npm run serve --port=4040` for custom port)
+2. **Open WeWeb Editor**: Go to your WeWeb project
+3. **Open Dev Editor**: Dev tab → Open Dev Editor
+4. **Add Local Element**: Click "Add local Element" → Choose "custom" → Enter name and dev port
+5. **Validate Certificate**: Browser → Advanced → Continue to localhost (if prompted)
+6. **Test Component**: Drag component onto page to preview
+
+## Building for Production
+
+1. **Test Build**: `npm run build --name=component-name`
+2. **Push to GitHub**: Commit and push to repository
+3. **Import to WeWeb**: Dashboard → Coded components → Import element
+4. **Set Active Version**: Open version and set as active
+5. **Use in Editor**: Add panel → Coded components → Drag element
+
+## Common Patterns
+
+### Conditional Rendering Based on Editor State
+
+```javascript
+<template>
+  <div>
+    <div v-if="!isEditing">Production content</div>
+    <div v-else>Editor preview content</div>
+  </div>
+</template>
+```
+
+### Accessing Nested Properties
+
+If properties are nested in `ww-config.js`, access them via dot notation:
+
+```javascript
+// ww-config.js
+properties: {
+  card: {
+    type: "Object",
+    properties: {
+      title: { type: "Text" },
+    },
+  },
+}
+
+// Component
+this.content.card.title
+```
+
+### Event Handling
+
+Standard Vue event handling works normally:
+
+```javascript
+methods: {
+  handleClick() {
+    // Handle click event
+  },
+}
+```
+
+## Troubleshooting
+
+- **Component not loading**: Check port number matches in WeWeb editor
+- **Properties not updating**: Ensure property names match between `ww-config.js` and component
+- **Build errors**: Run `npm run build` to check for issues
+- **Editor state issues**: Verify `wwEditorState` prop is properly wrapped in editor comments
+
+## Important Notes
+
+- Changes in Dev Editor are NOT saved - use for testing only
+- Always test in both editor and production modes
+- Use browser console to debug issues
+- Component must be pushed to GitHub before importing to WeWeb workspace

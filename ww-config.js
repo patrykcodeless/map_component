@@ -1,24 +1,16 @@
 export default {
   editor: {
     label: {
-      en: "Simple Text",
+      en: "My Element",
     },
-    icon: "text",
   },
   properties: {
-    text: {
-      label: { en: "Text Content" },
-      type: "Text",
-      section: "settings",
-      defaultValue: "Hello from WeWeb!",
-      bindable: true,
-      /* wwEditor:start */
-      bindingValidation: {
-        type: "string",
-        tooltip: "Text to display",
+    textColor: {
+      label: {
+        en: "Text color",
       },
-      propertyHelp: "Enter the text you want to display",
-      /* wwEditor:end */
+      type: "Color",
+      defaultValue: "#F23636",
     },
   },
 };
