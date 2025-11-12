@@ -1,7 +1,7 @@
 {
-  "name": "nomadano-leaflet-map",
+  "name": "simple-text-component",
   "version": "1.0.0",
-  "description": "Interactive Leaflet map component for WeWeb - lightweight and free alternative to Mapbox",
+  "description": "Simple text display component for WeWeb - minimal test component",
   "main": "dist/manager.js",
   "repository": {
     "type": "git",
@@ -11,12 +11,10 @@
   "author": "patrykcodeless",
   "license": "MIT",
   "scripts": {
-    "build": "weweb build name=nomadano-leaflet-map type=element",
+    "build": "weweb build name=simple-text-component type=element",
     "serve": "weweb serve"
   },
-  "dependencies": {
-    "leaflet": "^1.9.4"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@weweb/cli": "latest"
   }
